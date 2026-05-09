@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>简单博客 | 分享见解与故事</title>
+    <!-- 清新风格，无外部依赖，纯原生HTML/CSS框架 -->
+    <style>
+        /* ---------- RESET & 基础变量 ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: #faf9f8;
+            color: #1e1e2a;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* 容器约束，最大宽度，居中 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* 辅助间距 */
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .text-center { text-align: center; }
+
+        /* ---------- 头部导航 ---------- */
+        .site-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #eaeaea;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(2px);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .header-inner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .logo-area a {
+            text-decoration: none;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #2c3e66, #1a2a44);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .logo-area p {
+            font-size: 0.8rem;
+            color: #6c6f78;
+            margin-top: 4px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #2d3e50;
+            transition: color 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: #2c6e9e;
+            border-bottom: 2px solid #2c6e9e;
+            padding-bottom: 4px;
+        }
+
+        /* ---------- 主体网格布局 (博客核心框架) ---------- */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2.5rem;
+            margin: 2.5rem 0;
+        }
+
+        /* 文章列表区域 */
+        .articles-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .post-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.03);
+            transition: box-shadow 0.2s, transform 0.1s ease;
+            border: 1px solid #edf2f7;
+        }
+
+        .post-card:hover {
+            box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.12);
+            border-color: #e2e8f0;
+        }
+
+        .post-meta {
+            font-size: 0.8rem;
+            color: #6c86a3;
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .post-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .post-title a {
+            text-decoration: none;
+            color: #1e293b;
+            transition: color 0.2s;
+        }
+
+        .post-title a:hover {
+            color: #2c6e9e;
+        }
+
+        .post-excerpt {
+            color: #334155;
+            margin: 1rem 0 1.2rem 0;
+            border-left: 3px solid #cbd5e1;
+            padding-left: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            color: #2c6e9e;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .read-more::after {
+            content: "→";
+            transition: transform 0.2s;
+        }
+
+        .read-more:hover::after {
+            transform: translateX(4px);
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-widget {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 1.4rem 1.5rem;
+            border: 1px solid #eef2f6;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .widget-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-left: 4px solid #2c6e9e;
+            padding-left: 0.75rem;
+            margin-bottom: 1.1rem;
+            color: #0f172a;
+        }
+
+        .about-text {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .categories-list {
+            list-style: none;
+        }
+
+        .categories-list li {
+            margin-bottom: 0.7rem;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .categories-list a {
+            text-decoration: none;
+            color: #2d3e50;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .categories-list a:hover {
+            color: #2c6e9e;
+        }
+
+        .recent-posts {
+            list-style: none;
+        }
+
+        .recent-posts li {
+            margin-bottom: 0.9rem;
+        }
+
+        .recent-posts a {
+            text-decoration: none;
+            color: #2d3e50;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: block;
+            transition: color 0.2s;
+        }
+
+        .recent-posts a:hover {
+            color: #2c6e9e;
+        }
+
+        .recent-date {
+            font-size: 0.7rem;
+            color: #7c8b9f;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* 页脚区域 */
+        .site-footer {
+            background-color: #11161f;
+            color: #cbd5e6;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid #1e2a3a;
+        }
+
+        .footer-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            font-size: 0.85rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.8rem;
+        }
+
+        .footer-links a {
+            color: #cbd5e6;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        /* 响应式: 移动端切换为单列 */
+        @media (max-width: 768px) {
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 1.8rem;
+            }
+            .header-inner {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .nav-links {
+                justify-content: center;
+            }
+            .container {
+                padding: 0 20px;
+            }
+            .post-title {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* 简单点缀 */
+        hr {
+            margin: 0.8rem 0;
+            border: none;
+            border-top: 1px solid #e9edf2;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 博客头部 / 导航框架 -->
+<header class="site-header">
+    <div class="container header-inner">
+        <div class="logo-area">
+            <a href="#" aria-label="博客首页">📝 墨言博客</a>
+            <p>随笔 · 思考 · 记录</p>
+        </div>
+        <nav class="nav-links" aria-label="主导航">
+            <a href="#">首页</a>
+            <a href="#">文章</a>
+            <a href="#">关于</a>
+            <a href="#">搜索</a>
+        </nav>
+    </div>
+</header>
+
+<!-- 主体内容容器 -->
+<main class="container">
+    <div class="blog-grid">
+        <!-- 左侧内容区：文章列表 （博客核心）-->
+        <div class="articles-section">
+            <!-- 文章卡片 1 -->
+            <article class="post-card">
+                <div class="post-meta">
+                    <span>📅 2026年4月28日</span>
+                    <span>✍️ 生活随笔</span>
+                    <span>⏱️ 4分钟阅读</span>
+                </div>
+                <h2 class="post-title">
+                    <a href="#">构建简单博客的价值：从框架开始</a>
+                </h2>
+                <div class="post-excerpt">
+                    写博客不仅仅是记录，更是一次思想的重构。这个简单的HTML博客框架提供了干净、轻量的起点，让你专注于内容创作，无过多复杂依赖。每一段文字都能发光。
+                </div>
+                <a href="#" class="read-more">阅读全文</a>
+            </article>
+
+            <!-- 文章卡片 2 -->
+            <article class="post-card">
+                <div class="post-meta">
+                    <span>📅 2026年4月22日</span>
+                    <span>💻 技术笔记</span>
+                    <span>⏱️ 6分钟阅读</span>
+                </div>
+                <h2 class="post-title">
+                    <a href="#">前端布局进化：Grid与Flex的实用组合</a>
+                </h2>
+                <div class="post-excerpt">
+                    现代的CSS网格系统赋予设计师无与伦比的控制力。在博客框架中，我们用grid实现内容与侧边栏的自适应，同时配合媒体查询，让移动端阅读体验同样优雅。
+                </div>
+                <a href="#" class="read-more">阅读全文</a>
+            </article>
+
+            <!-- 文章卡片 3 -->
+            <article class="post-card">
+                <div class="post-meta">
+                    <span>📅 2026年4月15日</span>
+                    <span>📖 读书有感</span>
+                    <span>⏱️ 3分钟阅读</span>
+                </div>
+                <h2 class="post-title">
+                    <a href="#">《写作这回事》| 坚持表达的勇气</a>
+                </h2>
+                <div class="post-excerpt">
+                    一本书，一些灵感，一个简单的博客就是输出的最佳伙伴。无论技术如何更迭，真诚的文字总能抵达读者的内心。希望这个博客框架鼓励你开始写下第一篇。
+                </div>
+                <a href="#" class="read-more">阅读全文</a>
+            </article>
+
+            <!-- 文章卡片 4 (演示更多内容框架) -->
+            <article class="post-card">
+                <div class="post-meta">
+                    <span>📅 2026年4月8日</span>
+                    <span>🎨 设计思维</span>
+                    <span>⏱️ 5分钟阅读</span>
+                </div>
+                <h2 class="post-title">
+                    <a href="#">极简主义博客布局背后的设计原则</a>
+                </h2>
+                <div class="post-excerpt">
+                    留白、呼吸感、对比度。一个好的博客框架不需要华丽的外衣，而是要为阅读让路。此基础模版专注于可读性与结构清晰度，方便你自由定制主题。
+                </div>
+                <a href="#" class="read-more">阅读全文</a>
+            </article>
+        </div>
+
+        <!-- 右侧边栏：关于、分类、最近文章等辅助模块 -->
+        <aside class="sidebar">
+            <!-- 博主简介卡片 -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">📌 关于博客</h3>
+                <div class="about-text">
+                    <p><h2>你好，我是蒋佳域</h2>。这是一个纯粹的博客框架示例，干净、易读、适配现代浏览器。</p>
+                    <p style="margin-top: 10px;">你可以将它作为个人站点的起点，替换内容、图片或自定义任何样式。始终遵循轻量原则。</p>
+                    <hr>
+                    <p>✨ “写作是为了再次阅读自己”</p>
+                </div>
+            </div>
+
+            <!-- 分类目录 -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">📂 分类目录</h3>
+                <ul class="categories-list">
+                    <li><a href="#">技术探索 <span>9</span></a></li>
+                    <li><a href="#">生活日常 <span>12</span></a></li>
+                    <li><a href="#">阅读书评 <span>6</span></a></li>
+                    <li><a href="#">工具推荐 <span>4</span></a></li>
+                    <li><a href="#">设计灵感 <span>5</span></a></li>
+                </ul>
+            </div>
+
+            <!-- 近期热门/最新文章 -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">🕒 最新发布</h3>
+                <ul class="recent-posts">
+                    <li>
+                        <a href="#">从零搭建个人博客的心得体会</a>
+                        <span class="recent-date">2026.04.28</span>
+                    </li>
+                    <li>
+                        <a href="#">优雅处理博客中的代码高亮方案</a>
+                        <span class="recent-date">2026.04.20</span>
+                    </li>
+                    <li>
+                        <a href="#">春日书单｜虚构与真实之间</a>
+                        <span class="recent-date">2026.04.12</span>
+                    </li>
+                    <li>
+                        <a href="#">使用CSS Grid重构响应式布局</a>
+                        <span class="recent-date">2026.04.05</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 小小的订阅占位符 增强框架感 -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">📬 订阅动态</h3>
+                <div class="about-text">
+                    <p>暂未集成后端，但你可以预留邮箱订阅组件。框架适应性十足。</p>
+                    <div style="background: #f1f5f9; border-radius: 2rem; padding: 10px 12px; margin-top: 12px; text-align: center; font-size: 0.8rem; color: #2c6e9e;">
+                        📧  newsletter@blog.demo
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</main>
+
+<!-- 页脚区域 包含基本链接和版权 -->
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div class="footer-copyright">
+            © 2026 墨言博客 | 自由撰写，简单框架
+        </div>
+        <div class="footer-links">
+            <a href="#">关于本站</a>
+            <a href="#">隐私说明</a>
+            <a href="#">RSS</a>
+            <a href="#">友情链接</a>
+        </div>
+    </div>
+</footer>
+
+<!-- 说明：这是一个纯静态HTML博客框架，没有复杂JS依赖，展示基础内容布局，方便扩展。
+     所有链接为演示占位，实际使用时可替换为真实链接。
+     博客文章卡片、侧边栏组件构成清晰的内容层级，完全符合博客所需的核心结构。 -->
+</body>
+</html>
